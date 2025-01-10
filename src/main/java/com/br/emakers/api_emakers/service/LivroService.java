@@ -23,10 +23,6 @@ public class LivroService {
         return livros.stream().map(LivroResponseDTO::new).collect(Collectors.toList());
     }
 
-    private Livro getLivroEntityById(Long idLivro) {
-        return livroRepository.findById(idLivro).orElseThrow(()-> new RuntimeException("Esse livro não foi encontrado"));
-    }
-
     public LivroResponseDTO getLivroById(Long idLivro) {
         Livro livro = getLivroEntityById(idLivro);
 
@@ -53,6 +49,10 @@ public class LivroService {
         Livro livro = getLivroEntityById(idLivro);
         livroRepository.delete(livro);
         return "O livro " + idLivro + " foi removido";
+    }
+
+    private Livro getLivroEntityById(Long idLivro) {
+        return livroRepository.findById(idLivro).orElseThrow(()-> new RuntimeException("Esse livro não foi encontrado"));
     }
 
 }
