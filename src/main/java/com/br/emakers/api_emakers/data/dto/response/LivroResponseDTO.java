@@ -2,6 +2,7 @@ package com.br.emakers.api_emakers.data.dto.response;
 
 import com.br.emakers.api_emakers.data.entity.Livro;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 public record LivroResponseDTO(
@@ -12,7 +13,7 @@ public record LivroResponseDTO(
 
         String autor,
 
-        Date dataLancamento
+        LocalDate dataLancamento
 ) {
 
     public LivroResponseDTO(Livro livro){

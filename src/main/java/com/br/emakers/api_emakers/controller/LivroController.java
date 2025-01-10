@@ -18,8 +18,6 @@ public class LivroController {
 
     @Autowired
     private LivroService serviceLivro;
-    @Autowired
-    private LivroService livroService;
 
     @GetMapping(value = "/all")
     public ResponseEntity<List<LivroResponseDTO>> findAll() {
@@ -38,12 +36,12 @@ public class LivroController {
 
     @PutMapping(value = "/update/{idLivro}")
     public ResponseEntity<LivroResponseDTO> updateLivro(@PathVariable Long idLivro ,@RequestBody LivroRequestDTO livroRequestDTO) {
-        return ResponseEntity.status(HttpStatus.OK).body(livroService.updateLivro(idLivro, livroRequestDTO));
+        return ResponseEntity.status(HttpStatus.OK).body(serviceLivro.updateLivro(idLivro, livroRequestDTO));
     }
 
     @DeleteMapping(value = "/delete/{idLivro}")
     public ResponseEntity<String> deleteLivro(@PathVariable Long idLivro) {
-        return ResponseEntity.status(HttpStatus.OK).body(livroService.deleteLivro(idLivro));
+        return ResponseEntity.status(HttpStatus.OK).body(serviceLivro.deleteLivro(idLivro));
     }
 
 }

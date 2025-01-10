@@ -22,7 +22,7 @@ public class PessoaController {
         return ResponseEntity.status(HttpStatus.OK).body(pessoaService.getAllPessoas());
     }
 
-    @GetMapping(value = "/{idPessoa}")
+        @GetMapping(value = "/{idPessoa}")
     public ResponseEntity<PessoaResponseDTO> getPessoaById(@PathVariable Long idPessoa) {
         return ResponseEntity.status(HttpStatus.OK).body(pessoaService.getPessoaById(idPessoa));
     }

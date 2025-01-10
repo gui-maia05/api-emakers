@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Getter
@@ -27,7 +28,7 @@ public class Livro {
     private String autor;
 
     @Column(name = "data_lancamento", nullable = false)
-    private Date dataLancamento;
+    private LocalDate dataLancamento;
 
     @Column(name = "livro_disponivel", nullable = false)
     private boolean isDisponivel = true;
@@ -36,7 +37,7 @@ public class Livro {
     public Livro(LivroRequestDTO livroRequestDTO) {
         this.nome = livroRequestDTO.nome();
         this.autor = livroRequestDTO.autor();
-        this.dataLancamento = livroRequestDTO.data_lancamento();
+        this.dataLancamento = livroRequestDTO.dataLancamento();
         this.isDisponivel = true;
     }
 
