@@ -19,7 +19,6 @@ public record LivroRequestDTO(
 
         @NotNull(message = "A data de lançamento é obrigatória")
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
-        @PastOrPresent(message = "A data de lançamento do livro não pode ser no futuro")
         LocalDate dataLancamento
 ) {
 }
