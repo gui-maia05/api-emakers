@@ -5,6 +5,7 @@ import com.br.emakers.api_emakers.data.dto.response.EmprestimoResponseDTO;
 import com.br.emakers.api_emakers.data.entity.Emprestimo;
 import com.br.emakers.api_emakers.data.entity.Livro;
 import com.br.emakers.api_emakers.data.entity.Pessoa;
+import com.br.emakers.api_emakers.exceptions.general.EntityNotFoundException;
 import com.br.emakers.api_emakers.repository.EmprestimoRepository;
 import com.br.emakers.api_emakers.repository.LivroRepository;
 import com.br.emakers.api_emakers.repository.PessoaRepository;
@@ -18,13 +19,13 @@ import java.util.stream.Collectors;
 public class EmprestimoService {
 
     @Autowired
+    private EmprestimoRepository emprestimoRepository;
+
+    @Autowired
     private PessoaRepository pessoaRepository;
 
     @Autowired
     private LivroRepository livroRepository;
-
-    @Autowired
-    private EmprestimoRepository emprestimoRepository;
 
     public List<EmprestimoResponseDTO> getAllEmprestimos() {
         List<Emprestimo> emprestimosAtivos = emprestimoRepository.findByDataDevolucaoIsNull();
@@ -34,7 +35,7 @@ public class EmprestimoService {
 
     public EmprestimoResponseDTO realizarEmprestimo(EmprestimoRequestDTO dto) {
         Pessoa pessoa = pessoaRepository.findById(dto.idPessoa())
-                .orElseThrow(() -> new RuntimeException("A Pessoa com o ID: " + dto.idPessoa() + "não foi encontrada!"));
+                .orElseThrow(() -> new EntityNotFoundException(dto.idPessoa()));
 
         // Verifica se a pessoa já pegou 2 livros
         long quantidadeLivrosEmprestados = emprestimoRepository.countByPessoaAndDataDevolucaoIsNull(pessoa);
@@ -43,17 +44,16 @@ public class EmprestimoService {
         }
 
         Livro livro = livroRepository.findById(dto.idLivro())
-                .orElseThrow(() -> new RuntimeException("O livro com o ID: " + dto.idLivro() + " não foi encontrado!"));
+                .orElseThrow(() -> new EntityNotFoundException(dto.idLivro()));
 
         if (livro.isDisponivel()) {
             Emprestimo emprestimo = new Emprestimo();
             emprestimo.setPessoa(pessoa);
-            livro.setDisponivel(false);  // O livro agora não está mais disponível
+            livro.setDisponivel(false);
             emprestimo.setLivro(livro);
             emprestimo.setDataEmprestimo(new java.util.Date());
             emprestimo.setDataDevolucao(null);  // O livro ainda não foi devolvido
 
-            // Salva o empréstimo e a alteração de disponibilidade do livro
             emprestimoRepository.save(emprestimo);
             livroRepository.save(livro);
 
@@ -65,7 +65,7 @@ public class EmprestimoService {
 
     public EmprestimoResponseDTO devolverEmprestimo(Long idEmprestimo) {
         Emprestimo emprestimo = emprestimoRepository.findById(idEmprestimo)
-                .orElseThrow(() -> new RuntimeException("O empréstimo com ID " + idEmprestimo + " não foi encontrado!"));
+                .orElseThrow(() -> new EntityNotFoundException(idEmprestimo));
 
         if (emprestimo.getDataDevolucao() != null) {
             throw new RuntimeException("Este empréstimo já foi devolvido.");
@@ -75,7 +75,6 @@ public class EmprestimoService {
         emprestimo.setDataDevolucao(new java.util.Date());
         emprestimo.getLivro().setDisponivel(true);
 
-        // Salva as alterações no empréstimo e no livro
         emprestimoRepository.save(emprestimo);
         livroRepository.save(emprestimo.getLivro());
 
