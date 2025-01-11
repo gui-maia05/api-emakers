@@ -3,6 +3,7 @@ package com.br.emakers.api_emakers.service;
 import com.br.emakers.api_emakers.data.dto.request.PessoaRequestDTO;
 import com.br.emakers.api_emakers.data.dto.response.PessoaResponseDTO;
 import com.br.emakers.api_emakers.data.entity.Pessoa;
+import com.br.emakers.api_emakers.exceptions.general.EntityNotFoundException;
 import com.br.emakers.api_emakers.repository.PessoaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -52,6 +53,6 @@ public class PessoaService {
     }
 
     private Pessoa getPessoaEntityById(Long idPessoa) {
-        return repositoryPessoa.findById(idPessoa).orElseThrow(()-> new RuntimeException("Pessoa não encontrada."));
+        return repositoryPessoa.findById(idPessoa).orElseThrow(()-> new EntityNotFoundException(idPessoa));
     }
 }

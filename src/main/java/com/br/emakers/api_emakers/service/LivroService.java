@@ -4,6 +4,7 @@ package com.br.emakers.api_emakers.service;
 import com.br.emakers.api_emakers.data.dto.request.LivroRequestDTO;
 import com.br.emakers.api_emakers.data.dto.response.LivroResponseDTO;
 import com.br.emakers.api_emakers.data.entity.Livro;
+import com.br.emakers.api_emakers.exceptions.general.EntityNotFoundException;
 import com.br.emakers.api_emakers.repository.LivroRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -54,7 +55,7 @@ public class LivroService {
     }
 
     private Livro getLivroEntityById(Long idLivro) {
-        return livroRepository.findById(idLivro).orElseThrow(()-> new RuntimeException("Livro não encontrado."));
+        return livroRepository.findById(idLivro).orElseThrow(()-> new EntityNotFoundException(idLivro));
     }
 
 }
