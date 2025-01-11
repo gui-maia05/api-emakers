@@ -40,6 +40,8 @@ public class LivroService {
         Livro livro = getLivroEntityById(idLivro);
 
         livro.setNome(livroRequestDTO.nome());
+        livro.setAutor(livroRequestDTO.autor());
+        livro.setDataLancamento(livroRequestDTO.dataLancamento());
         livroRepository.save(livro);
 
         return new LivroResponseDTO(livro);
@@ -48,11 +50,11 @@ public class LivroService {
     public String deleteLivro(Long idLivro) {
         Livro livro = getLivroEntityById(idLivro);
         livroRepository.delete(livro);
-        return "O livro " + idLivro + " foi removido";
+        return "O livro de ID: " + idLivro + " foi removido!";
     }
 
     private Livro getLivroEntityById(Long idLivro) {
-        return livroRepository.findById(idLivro).orElseThrow(()-> new RuntimeException("Esse livro não foi encontrado"));
+        return livroRepository.findById(idLivro).orElseThrow(()-> new RuntimeException("Livro não encontrado."));
     }
 
 }

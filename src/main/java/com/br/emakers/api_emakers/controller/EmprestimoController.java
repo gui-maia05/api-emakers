@@ -11,33 +11,31 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/emprestimo")
+@RequestMapping("emprestimos")
 public class EmprestimoController {
 
     @Autowired
     private EmprestimoService emprestimoService;
 
-    /**
-     * Endpoint para realizar um empréstimo.
-     *
-     * @param emprestimoRequestDTO Dados do empréstimo.
-     * @return Lista de todos os empréstimos atualizada.
-     */
-    @PostMapping
-    public ResponseEntity<List<EmprestimoResponseDTO>> fazerEmprestimo(@RequestBody EmprestimoRequestDTO emprestimoRequestDTO) {
-        List<EmprestimoResponseDTO> emprestimos = emprestimoService.fazerEmprestimos(emprestimoRequestDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(emprestimos);
+    @GetMapping(value = "/all")
+    public ResponseEntity<List<EmprestimoResponseDTO>> findAll() {
+        return ResponseEntity.status(HttpStatus.OK).body(emprestimoService.getAllEmprestimos());
     }
 
-    /**
-     * Endpoint para devolver um livro.
-     *
-     * @param idEmprestimo ID do empréstimo.
-     * @return Dados do empréstimo após a devolução.
-     */
-    @PutMapping("/{idEmprestimo}/devolucao")
-    public ResponseEntity<EmprestimoResponseDTO> fazerDevolucaoEmprestimo(@PathVariable Long idEmprestimo) {
-        EmprestimoResponseDTO emprestimo = emprestimoService.devolverLivro(idEmprestimo);
-        return ResponseEntity.status(HttpStatus.OK).body(emprestimo);
+
+    @PostMapping("/fazerEmprestimo")
+    public ResponseEntity<EmprestimoResponseDTO> realizarEmprestimo(@RequestBody EmprestimoRequestDTO emprestimoRequestDTO) {
+        EmprestimoResponseDTO response = emprestimoService.realizarEmprestimo(emprestimoRequestDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+
+    @PutMapping("/devolver/{idEmprestimo}")
+    public ResponseEntity<EmprestimoResponseDTO> devolverEmprestimo(@PathVariable Long idEmprestimo) {
+        EmprestimoResponseDTO response = emprestimoService.devolverEmprestimo(idEmprestimo);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }
+
+
+

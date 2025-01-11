@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -27,9 +28,12 @@ public class Emprestimo {
     @JoinColumn(name = "id_livro", nullable = false)
     private Livro livro;
 
-    @Column(name = "data_emprestimo", nullable = false)
-    private LocalDate dataEmprestimo;
+    @Column(name = "data_emprestimo", nullable = true)
+    private Date dataEmprestimo;
 
-    @Column(name = "data_devolucao", nullable = false)
-    private LocalDate dataDevolucao;
+    @Column(name = "data_devolucao", nullable = true)
+    private Date dataDevolucao;
+
+    private String status;
+
 }

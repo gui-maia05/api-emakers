@@ -28,25 +28,21 @@ public class Livro {
     private String autor;
 
     @Column(name = "data_lancamento", nullable = false)
-    private LocalDate dataLancamento;
+    private Date dataLancamento;
 
-    @Column(name = "livro_disponivel", nullable = false)
-    private boolean isDisponivel = true;
+    @Column(name = "livro_disponivel", nullable = true)
+    private Boolean disponivel;
 
     @Builder
     public Livro(LivroRequestDTO livroRequestDTO) {
         this.nome = livroRequestDTO.nome();
         this.autor = livroRequestDTO.autor();
         this.dataLancamento = livroRequestDTO.dataLancamento();
-        this.isDisponivel = true;
+        this.disponivel = livroRequestDTO.disponivel();
     }
 
     public boolean isDisponivel() {
-        return isDisponivel;
-    }
-    public void setDisponivel(boolean disponivel){
-        this.isDisponivel = disponivel;
-
+        return disponivel;
     }
 
 }

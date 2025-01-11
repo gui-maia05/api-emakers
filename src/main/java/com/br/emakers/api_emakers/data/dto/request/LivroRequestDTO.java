@@ -7,18 +7,21 @@ import jakarta.validation.constraints.PastOrPresent;
 
 
 import java.time.LocalDate;
+import java.util.Date;
 
 
 public record LivroRequestDTO(
 
-        @NotBlank(message = "O nome do livro é obrigatório")
+        @NotBlank(message = "O nome do livro é obrigatório.")
         String nome,
 
-        @NotBlank(message = "O nome do autor é obrigatório")
+        @NotBlank(message = "O nome do autor é obrigatório.")
         String autor,
 
-        @NotNull(message = "A data de lançamento é obrigatória")
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
-        LocalDate dataLancamento
+        @NotNull(message = "A data de lançamento do livro é obrigatória.")
+        Date dataLancamento,
+
+        Boolean disponivel
 ) {
 }

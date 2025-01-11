@@ -1,4 +1,5 @@
 package com.br.emakers.api_emakers.service;
+
 import com.br.emakers.api_emakers.data.dto.request.EmprestimoRequestDTO;
 import com.br.emakers.api_emakers.data.dto.response.EmprestimoResponseDTO;
 import com.br.emakers.api_emakers.data.entity.Emprestimo;
@@ -9,17 +10,12 @@ import com.br.emakers.api_emakers.repository.LivroRepository;
 import com.br.emakers.api_emakers.repository.PessoaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.time.LocalDate;
-import java.util.Date;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
-
 @Service
 public class EmprestimoService {
-
-    @Autowired
-    private EmprestimoRepository emprestimoRepository;
 
     @Autowired
     private PessoaRepository pessoaRepository;
@@ -27,64 +23,62 @@ public class EmprestimoService {
     @Autowired
     private LivroRepository livroRepository;
 
-    public List<EmprestimoResponseDTO> fazerEmprestimos(EmprestimoRequestDTO emprestimoRequestDTO) {
+    @Autowired
+    private EmprestimoRepository emprestimoRepository;
 
-        Pessoa pessoa = pessoaRepository.findById(emprestimoRequestDTO.idPessoa())
-                .orElseThrow(() -> new RuntimeException("O ID da pessoa não está cadastrado!"));
-
-        Livro livro = livroRepository.findById(emprestimoRequestDTO.idLivro())
-                .orElseThrow(() -> new RuntimeException("O ID do livro não está cadastrado!"));
-
-        if (!livro.isDisponivel()) {
-            throw new RuntimeException("O livro não está disponível para empréstimo!");
-        }
-        // Realizar o empréstimo
-        Emprestimo emprestimo = new Emprestimo();
-        emprestimo.setPessoa(pessoa);
-        emprestimo.setLivro(livro);
-        emprestimo.setDataEmprestimo(LocalDate.now());
-        emprestimo.setDataDevolucao(null);
-
-        // Atualizar disponibilidade do livro
-        livro.setDisponivel(false);
-        livroRepository.save(livro);
-
-        // Salvar o empréstimo
-        emprestimoRepository.save(emprestimo);
-        return emprestimoRepository.findAll().stream()
-                .map(e -> new EmprestimoResponseDTO(
-                        e.getIdEmprestimo(),
-                        e.getPessoa(),
-                        e.getLivro(),
-                        e.getDataEmprestimo(),
-                        e.getDataDevolucao()
-                ))
-                .collect(Collectors.toList());
+    public List<EmprestimoResponseDTO> getAllEmprestimos() {
+        List<Emprestimo> emprestimosAtivos = emprestimoRepository.findByDataDevolucaoIsNull();
+        return emprestimosAtivos.stream().map(EmprestimoResponseDTO::new).collect(Collectors.toList());
     }
 
-    public EmprestimoResponseDTO devolverLivro(Long idEmprestimo) {
-        Emprestimo emprestimo = emprestimoRepository.findById(idEmprestimo)
-                .orElseThrow(() -> new RuntimeException("O ID do empréstimo não está cadastrado!"));
-        if (emprestimo.getDataDevolucao() != null) {
-            throw new RuntimeException("O livro já foi devolvido!");
+
+    public EmprestimoResponseDTO realizarEmprestimo(EmprestimoRequestDTO dto) {
+        Pessoa pessoa = pessoaRepository.findById(dto.idPessoa())
+                .orElseThrow(() -> new RuntimeException("A Pessoa com o ID: " + dto.idPessoa() + "não foi encontrada!"));
+
+        // Verifica se a pessoa já pegou 2 livros
+        long quantidadeLivrosEmprestados = emprestimoRepository.countByPessoaAndDataDevolucaoIsNull(pessoa);
+        if (quantidadeLivrosEmprestados >= 2) {
+            throw new RuntimeException("A pessoa já possui dois livros emprestados.");
         }
 
-        // Realizar a devolução
-        emprestimo.setDataDevolucao(LocalDate.now());
+        Livro livro = livroRepository.findById(dto.idLivro())
+                .orElseThrow(() -> new RuntimeException("O livro com o ID: " + dto.idLivro() + " não foi encontrado!"));
 
-        // Atualizar disponibilidade do livro
-        Livro livro = emprestimo.getLivro();
-        livro.setDisponivel(true);
-        livroRepository.save(livro);
+        if (livro.isDisponivel()) {
+            Emprestimo emprestimo = new Emprestimo();
+            emprestimo.setPessoa(pessoa);
+            livro.setDisponivel(false);  // O livro agora não está mais disponível
+            emprestimo.setLivro(livro);
+            emprestimo.setDataEmprestimo(new java.util.Date());
+            emprestimo.setDataDevolucao(null);  // O livro ainda não foi devolvido
 
-        // Salvar alterações no empréstimo
+            // Salva o empréstimo e a alteração de disponibilidade do livro
+            emprestimoRepository.save(emprestimo);
+            livroRepository.save(livro);
+
+            return new EmprestimoResponseDTO(emprestimo);
+        } else {
+            throw new RuntimeException("O livro com ID " + dto.idLivro() + " não está disponível para empréstimo.");
+        }
+    }
+
+    public EmprestimoResponseDTO devolverEmprestimo(Long idEmprestimo) {
+        Emprestimo emprestimo = emprestimoRepository.findById(idEmprestimo)
+                .orElseThrow(() -> new RuntimeException("O empréstimo com ID " + idEmprestimo + " não foi encontrado!"));
+
+        if (emprestimo.getDataDevolucao() != null) {
+            throw new RuntimeException("Este empréstimo já foi devolvido.");
+        }
+
+        // Marca o livro como disponível novamente e define a data de devolução
+        emprestimo.setDataDevolucao(new java.util.Date());
+        emprestimo.getLivro().setDisponivel(true);
+
+        // Salva as alterações no empréstimo e no livro
         emprestimoRepository.save(emprestimo);
-        return new EmprestimoResponseDTO(
-                emprestimo.getIdEmprestimo(),
-                emprestimo.getPessoa(),
-                emprestimo.getLivro(),
-                emprestimo.getDataEmprestimo(),
-                emprestimo.getDataDevolucao()
-        );
+        livroRepository.save(emprestimo.getLivro());
+
+        return new EmprestimoResponseDTO(emprestimo);
     }
 }

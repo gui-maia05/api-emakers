@@ -48,10 +48,10 @@ public class PessoaService {
     public String deletePessoa(Long idPessoa) {
         Pessoa pessoa = getPessoaEntityById(idPessoa);
         repositoryPessoa.delete(pessoa);
-        return "O ID " + idPessoa + " foi removido";
+        return "A pessoa de ID: " + idPessoa + " foi removida!";
     }
 
     private Pessoa getPessoaEntityById(Long idPessoa) {
-        return repositoryPessoa.findById(idPessoa).orElseThrow(()-> new RuntimeException("Essa Pessoa não foi encontrada"));
+        return repositoryPessoa.findById(idPessoa).orElseThrow(()-> new RuntimeException("Pessoa não encontrada."));
     }
 }

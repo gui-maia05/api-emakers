@@ -5,6 +5,7 @@ import com.br.emakers.api_emakers.data.entity.Livro;
 import com.br.emakers.api_emakers.data.entity.Pessoa;
 
 import java.time.LocalDate;
+import java.util.Date;
 
 public record EmprestimoResponseDTO(
 
@@ -14,9 +15,9 @@ public record EmprestimoResponseDTO(
 
         Livro livro,
 
-        LocalDate dataEmprestimo,
+        Date dataEmprestimo,
 
-        LocalDate dataDevolucao
+        Date dataDevolucao
 ) {
 
     public EmprestimoResponseDTO(Emprestimo emprestimo){
